@@ -21,9 +21,8 @@ export const site = {
   phoneDisplay: "+91 76686 91838",
   whatsappNumber: "917668691838",
   whatsappMessage: "Hi ZELVRYQ, I would like to discuss a project.",
-  /** PLACEHOLDER — REPLACE BEFORE LAUNCH */
-  email: "hello@example-demo.zelvryq",
-  emailIsPlaceholder: true,
+  email: "zelvrpq@gmail.com",
+  emailIsPlaceholder: false,
   /** PLACEHOLDER — REPLACE BEFORE LAUNCH */
   instagram: "#",
   /** PLACEHOLDER — REPLACE BEFORE LAUNCH */

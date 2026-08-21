@@ -6,7 +6,6 @@ import { PageHero } from "@/components/PageHero";
 import {
   ClientLogos,
   CompanyStory,
-  FoundersSection,
   ProcessTimeline,
   Testimonials,
   WhyZelvryq,
@@ -72,7 +71,6 @@ function About() {
       </Section>
 
       <CompanyStory />
-      <FoundersSection />
       <WhyZelvryq />
       <ProcessTimeline />
       <Testimonials />
