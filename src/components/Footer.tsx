@@ -68,10 +68,14 @@ export function Footer() {
                 WhatsApp {site.phone}
               </a>
             </li>
-            <li className="flex flex-wrap items-center gap-2 text-muted-foreground">
-              <Mail className="h-4 w-4 text-gold" aria-hidden="true" />
-              Email
-              <PlaceholderBadge label="Placeholder — replace before launch" />
+            <li>
+              <a
+                href={`mailto:${site.email}`}
+                className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-gold"
+              >
+                <Mail className="h-4 w-4 text-gold" aria-hidden="true" />
+                {site.email}
+              </a>
             </li>
             <li className="flex flex-wrap items-center gap-2 text-muted-foreground">
               <Instagram className="h-4 w-4 text-gold" aria-hidden="true" />

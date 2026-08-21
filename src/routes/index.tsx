@@ -8,7 +8,6 @@ import { FaqList } from "@/components/FaqList";
 import {
   ClientLogos,
   CompanyStory,
-  FoundersSection,
   InsightsPreview,
   ProcessTimeline,
   Testimonials,
@@ -240,7 +239,6 @@ function Home() {
         </div>
       </Section>
 
-      <FoundersSection />
       <CompanyStory />
       <Testimonials />
       <ClientLogos />
