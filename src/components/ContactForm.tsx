@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { AlertTriangle, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Mail, MessageCircle, Send } from "lucide-react";
 import { z } from "zod";
 
 import { ActionButton } from "@/components/ActionButton";
@@ -88,10 +88,30 @@ const fieldClass =
 const labelClass =
   "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground";
 
+const DRAFT_KEY = "zelvryq-inquiry-draft";
+
 export function ContactForm() {
   const [values, setValues] = useState<FormValues>(initial);
   const [errors, setErrors] = useState<Errors>({});
   const [prepared, setPrepared] = useState<string | null>(null);
+
+  // Restore an unfinished enquiry so a visitor never loses what they typed.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(DRAFT_KEY);
+      if (saved) setValues({ ...initial, ...(JSON.parse(saved) as Partial<FormValues>) });
+    } catch {
+      /* ignore unreadable drafts */
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [values]);
 
   const set = (key: keyof FormValues) => (value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -129,19 +149,6 @@ export function ContactForm() {
 
   return (
     <div>
-      <div
-        role="note"
-        className="flex gap-3 border border-dashed border-gold/50 p-4 text-xs leading-relaxed text-muted-foreground"
-      >
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden="true" />
-        <p>
-          <strong className="text-gold">Internal note — PLACEHOLDER SETUP.</strong> No email, CRM or
-          database delivery is configured yet, so this form does not claim a successful submission.
-          Once a backend or inbox is connected, submissions will be stored and emailed. Until then,
-          validated enquiries are prepared for WhatsApp so nothing is lost.
-        </p>
-      </div>
-
       <form onSubmit={onSubmit} noValidate className="mt-8 grid gap-6 md:grid-cols-2">
         <Field label="Name *" error={errors.name} id="name">
           <input
@@ -266,23 +273,38 @@ export function ContactForm() {
           className="surface-panel mt-8 p-6 text-sm text-muted-foreground"
         >
           <p className="font-display text-base font-bold uppercase text-foreground">
-            Your inquiry is validated and ready to send
+            One last step — choose how to send it
           </p>
           <p className="mt-2">
-            Backend delivery is not configured yet, so we will not pretend this was submitted. Send
-            the prepared summary over WhatsApp or call us directly — we respond quickly.
+            Your details are ready. Send them on WhatsApp for the fastest reply, or send by email if
+            you prefer. We usually respond within one working day.
           </p>
-          <pre className="mt-4 max-h-60 overflow-auto whitespace-pre-wrap border border-border bg-background p-4 text-xs">
-            {prepared}
-          </pre>
-          <a
-            href={`${whatsappHref.split("?")[0]}?text=${encodeURIComponent(prepared)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex h-12 items-center justify-center bg-gold-gradient px-7 text-[0.7rem] font-bold uppercase tracking-[0.18em] text-primary-foreground"
-          >
-            Send on WhatsApp
-          </a>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a
+              href={`${whatsappHref.split("?")[0]}?text=${encodeURIComponent(prepared)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 items-center justify-center gap-2 bg-gold-gradient px-7 text-[0.7rem] font-bold uppercase tracking-[0.18em] text-primary-foreground"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" /> Send on WhatsApp
+            </a>
+            <a
+              href={`mailto:${site.email}?subject=${encodeURIComponent(
+                `Project inquiry — ${site.name}`,
+              )}&body=${encodeURIComponent(prepared)}`}
+              className="inline-flex h-12 items-center justify-center gap-2 border border-gold/50 px-7 text-[0.7rem] font-bold uppercase tracking-[0.18em] text-gold transition-colors hover:bg-gold/10"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" /> Send by Email
+            </a>
+          </div>
+          <details className="mt-5">
+            <summary className="cursor-pointer text-xs uppercase tracking-[0.16em] text-gold">
+              Review your details
+            </summary>
+            <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap border border-border bg-background p-4 text-xs">
+              {prepared}
+            </pre>
+          </details>
         </div>
       )}
     </div>
