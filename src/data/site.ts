@@ -27,8 +27,9 @@ export const site = {
   instagram: "#",
   /** PLACEHOLDER — REPLACE BEFORE LAUNCH */
   linkedin: "#",
-  /** PLACEHOLDER — domain to be added before launch */
-  domain: "",
+  /** Live site address (update if a custom domain is added later) */
+  domain: "https://zelvryqmedia.lovable.app",
+
 } as const;
 
 export const whatsappHref = `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(
