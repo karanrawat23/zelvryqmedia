@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Mail, MessageCircle, Send } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { ActionButton } from "@/components/ActionButton";
 import { site, whatsappHref } from "@/data/site";
+import { submitLead } from "@/lib/leads.functions";
 import { cn } from "@/lib/utils";
+
 
 const serviceOptions = [
   "Digital Marketing",
@@ -91,9 +94,13 @@ const labelClass =
 const DRAFT_KEY = "zelvryq-inquiry-draft";
 
 export function ContactForm() {
+  const saveLead = useServerFn(submitLead);
   const [values, setValues] = useState<FormValues>(initial);
   const [errors, setErrors] = useState<Errors>({});
   const [prepared, setPrepared] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [saved, setSaved] = useState(false);
+
 
   // Restore an unfinished enquiry so a visitor never loses what they typed.
   useEffect(() => {
@@ -116,7 +123,7 @@ export function ContactForm() {
   const set = (key: keyof FormValues) => (value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
 
-  const onSubmit = (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const result = schema.safeParse(values);
     if (!result.success) {
@@ -144,8 +151,37 @@ export function ContactForm() {
     ]
       .filter(Boolean)
       .join("\n");
-    setPrepared(summary);
+
+    setSending(true);
+    setSaved(false);
+    try {
+      await saveLead({
+        data: {
+          name: v.name,
+          email: v.email,
+          phone: v.phone,
+          company: v.company ?? "",
+          website: v.website ?? "",
+          industry: v.industry ?? "",
+          service: v.services,
+          budget: v.budget ?? "",
+          message: v.message,
+        },
+      });
+      setSaved(true);
+      try {
+        window.localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* storage unavailable */
+      }
+    } catch {
+      setSaved(false);
+    } finally {
+      setSending(false);
+      setPrepared(summary);
+    }
   };
+
 
   return (
     <div>
@@ -260,8 +296,9 @@ export function ContactForm() {
         </div>
 
         <div className="md:col-span-2">
-          <ActionButton type="submit" variant="gold" size="lg">
-            <Send className="h-4 w-4" aria-hidden="true" /> Send Project Inquiry
+          <ActionButton type="submit" variant="gold" size="lg" disabled={sending}>
+            <Send className="h-4 w-4" aria-hidden="true" />{" "}
+            {sending ? "Sending…" : "Send Project Inquiry"}
           </ActionButton>
         </div>
       </form>
@@ -273,12 +310,14 @@ export function ContactForm() {
           className="surface-panel mt-8 p-6 text-sm text-muted-foreground"
         >
           <p className="font-display text-base font-bold uppercase text-foreground">
-            One last step — choose how to send it
+            {saved ? "Thank you — your enquiry has reached us" : "One last step — send it to us"}
           </p>
           <p className="mt-2">
-            Your details are ready. Send them on WhatsApp for the fastest reply, or send by email if
-            you prefer. We usually respond within one working day.
+            {saved
+              ? "We have received your details and our team will get back to you within one working day. Want a faster reply? Ping us on WhatsApp too."
+              : "We could not save your enquiry just now, so please send it on WhatsApp or by email and we will reply right away."}
           </p>
+
           <div className="mt-5 flex flex-wrap gap-3">
             <a
               href={`${whatsappHref.split("?")[0]}?text=${encodeURIComponent(prepared)}`}

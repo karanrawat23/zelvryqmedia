@@ -63,11 +63,14 @@ export const updateLead = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { id, ...patch } = data;
-    const { error } = await context.supabase.from("leads").update(patch).eq("id", id);
+    const patch: { status?: "new" | "contacted" | "closed"; internal_notes?: string | null } = {};
+    if (data.status !== undefined) patch.status = data.status;
+    if (data.internal_notes !== undefined) patch.internal_notes = data.internal_notes;
+    const { error } = await context.supabase.from("leads").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 /** Tells the signed-in user whether they are an approved team member. */
 export const checkIsAdmin = createServerFn({ method: "GET" })
