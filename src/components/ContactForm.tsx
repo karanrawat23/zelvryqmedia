@@ -296,8 +296,9 @@ export function ContactForm() {
         </div>
 
         <div className="md:col-span-2">
-          <ActionButton type="submit" variant="gold" size="lg">
-            <Send className="h-4 w-4" aria-hidden="true" /> Send Project Inquiry
+          <ActionButton type="submit" variant="gold" size="lg" disabled={sending}>
+            <Send className="h-4 w-4" aria-hidden="true" />{" "}
+            {sending ? "Sending…" : "Send Project Inquiry"}
           </ActionButton>
         </div>
       </form>
@@ -309,12 +310,14 @@ export function ContactForm() {
           className="surface-panel mt-8 p-6 text-sm text-muted-foreground"
         >
           <p className="font-display text-base font-bold uppercase text-foreground">
-            One last step — choose how to send it
+            {saved ? "Thank you — your enquiry has reached us" : "One last step — send it to us"}
           </p>
           <p className="mt-2">
-            Your details are ready. Send them on WhatsApp for the fastest reply, or send by email if
-            you prefer. We usually respond within one working day.
+            {saved
+              ? "We have received your details and our team will get back to you within one working day. Want a faster reply? Ping us on WhatsApp too."
+              : "We could not save your enquiry just now, so please send it on WhatsApp or by email and we will reply right away."}
           </p>
+
           <div className="mt-5 flex flex-wrap gap-3">
             <a
               href={`${whatsappHref.split("?")[0]}?text=${encodeURIComponent(prepared)}`}
