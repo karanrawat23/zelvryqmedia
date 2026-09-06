@@ -21,7 +21,7 @@ export const Route = createFileRoute("/auth")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: AuthPage;
+  component: AuthPage,
 });
 
 const fieldClass =
