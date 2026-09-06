@@ -116,7 +116,7 @@ export function ContactForm() {
   const set = (key: keyof FormValues) => (value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
 
-  const onSubmit = (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const result = schema.safeParse(values);
     if (!result.success) {
@@ -144,8 +144,37 @@ export function ContactForm() {
     ]
       .filter(Boolean)
       .join("\n");
-    setPrepared(summary);
+
+    setSending(true);
+    setSaved(false);
+    try {
+      await saveLead({
+        data: {
+          name: v.name,
+          email: v.email,
+          phone: v.phone,
+          company: v.company ?? "",
+          website: v.website ?? "",
+          industry: v.industry ?? "",
+          service: v.services,
+          budget: v.budget ?? "",
+          message: v.message,
+        },
+      });
+      setSaved(true);
+      try {
+        window.localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* storage unavailable */
+      }
+    } catch {
+      setSaved(false);
+    } finally {
+      setSending(false);
+      setPrepared(summary);
+    }
   };
+
 
   return (
     <div>
