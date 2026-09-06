@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Mail, MessageCircle, Send } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { ActionButton } from "@/components/ActionButton";
 import { site, whatsappHref } from "@/data/site";
+import { submitLead } from "@/lib/leads.functions";
 import { cn } from "@/lib/utils";
+
 
 const serviceOptions = [
   "Digital Marketing",
@@ -91,9 +94,13 @@ const labelClass =
 const DRAFT_KEY = "zelvryq-inquiry-draft";
 
 export function ContactForm() {
+  const saveLead = useServerFn(submitLead);
   const [values, setValues] = useState<FormValues>(initial);
   const [errors, setErrors] = useState<Errors>({});
   const [prepared, setPrepared] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [saved, setSaved] = useState(false);
+
 
   // Restore an unfinished enquiry so a visitor never loses what they typed.
   useEffect(() => {
